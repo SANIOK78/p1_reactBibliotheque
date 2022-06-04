@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import UnLivre from './Bouquin/unLivres';
 import FormulaireAjout from './FormulaireAjout/FormulaireAjout';
-
+import FormulaireModification from './FormulaireModification/FormulaireModification';
 
 class Livres extends Component {
     state = {
@@ -64,6 +64,39 @@ class Livres extends Component {
         this.props.fermerAjoutLivre();
     };
 
+    // fonction permettant la modification de livre choisi
+    // Cette fonction va récupérer les nouvelles valeurs a modifier
+    //et va faire le traitement: mise à jour de livre concerné
+    handleModificationLivre = (id, titre, auteur, nbPages) => {
+      
+      //1.- On va récupérer la case du livre concerne par la modification
+        const caseLivre = this.state.listeLivres.findIndex(el => {
+          //on compare le livre que je suis en train de parcourir(el.id)
+          //avec id qu'on a récupére en paramettre de fonction
+            return el.id === id;
+        });
+
+      //2. On va générer un livre a partir des information de parametre de fonction
+        const newLivre = {  //ce livre va contenir :
+            id :id,
+            titre : titre,
+            auteur: auteur,
+            nbPages : nbPages
+        }
+      //3. Copie du tableau pour réaliser des action (resper d'imutabilite ReactJS)
+        const newListe = [...this.state.listeLivres];
+      //4. Un fois que jai la nouvelle liste des livres je peux faire la modification
+      //a la case doné
+        newListe[caseLivre] = newLivre;
+
+      //5. Un fois que notre tableau de livres contien la modification, on peut 
+      //modifier les 'state' en lui envoyant le nouveau livre
+        this.setState({
+            listeLivres: newListe,
+            idLivreAModifier : 0     //on met aussi a jour
+        })
+
+    }
 
     render() {
         return (
@@ -82,8 +115,6 @@ class Livres extends Component {
                           //Partie permettan de lister/afficher nos livres en utilisant le composant "UnLivre"
                             this.state.listeLivres.map(livre => {
 
-                              {/* 1. Le Livre n'est pas a modifier */}
-                              {/* si c'est pas le même id  */}
                                 if(livre.id !== this.state.idLivreAModifier) {
                                     return (
                                         <tr key={livre.id}>
@@ -92,12 +123,22 @@ class Livres extends Component {
                                                 auteur = {livre.auteur}
                                                 nbPages = {livre.nbPages}
                                                 suppression = {() => this.handleSupprimLivre(livre.id)}                          
-                                                modification = {() => this.setState({idLivreAModifier : livre.id })}
+                                                modification = {() => this.setState({idLivreAModifier: livre.id })}
                                             />                                  
                                         </tr>
                                     );
-                                } else {   {/*Si l'id correspond a l7ID a modifier */}
-                                    return null
+                                } else {  
+                                    return (
+                                        <tr key={livre.id}>
+                                            <FormulaireModification
+                                                id = {livre.id}          //on rajout le id du livre a modifier
+                                                titre = {livre.titre}
+                                                auteur = {livre.auteur}
+                                                nbPages = {livre.nbPages}
+                                                validationModification = {this.handleModificationLivre}
+                                            />
+                                        </tr>
+                                    );    
                                 }
                             })
                         }  

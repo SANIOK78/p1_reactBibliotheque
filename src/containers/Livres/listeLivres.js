@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import UnLivre from './Bouquin/unLivres';
 import FormulaireAjout from './FormulaireAjout/FormulaireAjout';
 import FormulaireModification from './FormulaireModification/FormulaireModification';
+import Alert from "../../components/Alert/Alert";
 
 class Livres extends Component {
     state = {
@@ -13,11 +14,13 @@ class Livres extends Component {
         ],
       //on declare/initialise une propriete avec la valeur de dernier ID du livre
         lastIdLivre : 4,  
-        // On va stocker l'ID du livre sur lequelle on a cliqué 
-        idLivreAModifier : 0
+      // On va stocker l'ID du livre sur lequelle on a cliqué 
+        idLivreAModifier : 0,
+      //On stock une infos permettant d'afficher l'alert
+        alertMessage : null  //pas d'alert au départ
     }
 
-    // onction supprimant un livre
+    // fonction supprimant un livre
     handleSupprimLivre = (id) => {
 
         const indexLivreTab = this.state.listeLivres.findIndex(el => {
@@ -29,9 +32,13 @@ class Livres extends Component {
         // suppression du livre stocké dans 'indexLivreTab'
         newLivres.splice(indexLivreTab, 1);
         // ensuite il faut fusionner le nouveau tableau avec l'ancien
-        this.setState({listeLivres: newLivres});
-
-        console.log(newLivres);
+        this.setState({
+            listeLivres: newLivres,
+            alertMessage : {
+                message : "Suppression effectué !!!",
+                type: "alert-danger"
+            } 
+        });
     };
 
     // fonction permettant d'ajouter un livre    
@@ -56,7 +63,11 @@ class Livres extends Component {
         this.setState(oldState => {    
             return {                          //oldState = anciene valeure
                 listeLivres : newListeLivres, 
-                lastIdLivre : oldState.lastIdLivre + 1
+                lastIdLivre : oldState.lastIdLivre + 1,
+                alertMessage : {
+                    message: "Ajout effectué !!!",
+                    type: "alert-success"
+                }
             }
         });
 
@@ -93,14 +104,22 @@ class Livres extends Component {
       //modifier les 'state' en lui envoyant le nouveau livre
         this.setState({
             listeLivres: newListe,
-            idLivreAModifier : 0     //on met aussi a jour
+            idLivreAModifier : 0,     //on met aussi a jour
+            alertMessage : {
+                message: "Modification effectuée !!!",
+                type: "alert-warning"
+            }
         })
-
     }
 
     render() {
         return (
             <>
+             {/*On test si message d'alert n'est pas vide, alors on l'affiche  */}
+                {this.state.alertMessage && <Alert typeAlert = {this.state.alertMessage.type}>
+                    {this.state.alertMessage.message}
+                </Alert>}
+
                 <table className='table text-center'>
                     <thead>
                         <tr className='table-dark'>
